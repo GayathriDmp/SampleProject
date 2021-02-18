@@ -4,17 +4,8 @@
     "type": "object",
     "title": "The root schema",
     "description": "The root schema comprises the entire JSON document.",
-    "default": {
-          
-   },
-    "examples": [
-        {
-            "payer_id": 1,
-            "payerName": "abc",
-            "payment_type": "IPH",
-            "payerAccountNumber": 12345
-        }
-    ],
+   
+    
     "required": [
         "payer_id",
         "payerName",
@@ -24,45 +15,25 @@
     "properties": {
         "payer_id": {
             "$id": "#/properties/payer_id",
-            "type": ["integer","null"],
-             "default":123456,
-           	 "title": "The payer_id schema",
-            "description": "An explanation about the purpose of this instance.",
-           
-            "examples": [
-                1
-            ]
-        },
+            "type": "integer"
+            
+      },
         "payerName": {
             "$id": "#/properties/payerName",
-            "type": ["string","null"],
-            "title": "The payerName schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "abc"
-            ]
-        },
+            "type": "string"
+           
+       },
         "payment_type": {
             "$id": "#/properties/payment_type",
-            "type": ["string","null"],
-            "title": "The payment_type schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "IPH"
-            ]
-        },
+            "type": "string"
+            
+           
+      },
         "payerAccountNumber": {
             "$id": "#/properties/payerAccountNumber",
-            "type": ["integer","null"],
-            "title": "The payerAccountNumber schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": 0,
-            "examples": [
-                12345
-            ]
-        }
+            "type": "integer"
+           
+       }
     },
     "additionalProperties": true
 }
