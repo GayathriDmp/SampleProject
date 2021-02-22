@@ -1,11 +1,7 @@
 package com.example.config;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,12 +11,9 @@ import com.example.utils.JsonValidationUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Component
-public class CustomValidation {
+public class CustomValidation1 {
 	
 	@Autowired
 	CustomConfiguration configuration;
@@ -29,14 +22,11 @@ public class CustomValidation {
 		
 		try {
 					
-		JsonValidationUtil.getString(jsonNode,configuration.getObject().get(0),"IPH").asText();
+		JsonValidationUtil.getString(jsonNode,configuration.getObject().get(0),"IFP").asText();
 		
 		JsonValidationUtil.getString(jsonNode,"PAYMNT_AMOUNT","0.00").asDouble();
 		
-		JsonValidationUtil.getString(jsonNode,"SPL_PAYMNT_TYPE"," ");
-		JsonValidationUtil.getString(jsonNode, "PAYMNT_SUB_TYPE"," ");
-		
-		//extra validation for splPaymentType
+					
 		/*String splPaymentType = JsonValidationUtil.getsplPaymentType(jsonNode, "SPL_PAYMNT_TYPE");
 		if(splPaymentType.isEmpty()) {
 			JsonValidationUtil.getString(jsonNode,"SPL_PAYMENT_TYPE"," ");
@@ -45,17 +35,23 @@ public class CustomValidation {
 			JsonValidationUtil.updateJsonForString(jsonNode, "SPL_PAYMENT_TYPE", splPaymentType);
 		}*/
 		
+		JsonValidationUtil.getString(jsonNode, "SPL_PAYMENT_TYPE", " ").asText() ;
+		
 					
 		String processCodeValue = JsonValidationUtil.getStringValue(jsonNode,"PROCESS_CODE");
 		int processCode =JsonValidationUtil.ifEmptyString(processCodeValue);
 		JsonValidationUtil.updateJsonForInt(jsonNode, "PROCESS_CODE", processCode);
 		
-		JsonValidationUtil.getString(jsonNode, "PAYMNT_CURRENCY","826");
 		
-		//extra validations for paymentCurrency , paymentSubType
 			
 		//String paymentCurrency =JsonValidationUtil.convertCurrency(jsonNode, "PAYMNT_CURRENCY");
 		//JsonValidationUtil.updateJsonForString(jsonNode, "PAYMNT_CURRENCY", paymentCurrency);
+		
+		JsonValidationUtil.getString(jsonNode, "PAYMNT_CURRENCY","826");
+		
+		
+		
+					
 		
 		/*String paymentSubType=JsonValidationUtil.getPaymentSubType(jsonNode, "PAYMNT_SUB_TYPE");
 		if(JsonValidationUtil.getStringValue(jsonNode , "PAYMNT_SUB_TYPE").equals(" ")) {
@@ -68,6 +64,7 @@ public class CustomValidation {
 			JsonValidationUtil.updateJsonForString(jsonNode, "PAYMNT_SUB_TYPE",paymentSubType);
 		}*/
 					
+		JsonValidationUtil.getString(jsonNode, "PAYMNT_SUB_TYPE"," ");
 					
 		String paymentSentDate = JsonValidationUtil.convertDate(jsonNode, "PAYMNT_SENT_DATE");
 		if(paymentSentDate.isEmpty()) {
@@ -95,24 +92,15 @@ public class CustomValidation {
 		
 		JsonValidationUtil.getString(jsonNode,"BRAND","RBS").asText();
 		
-		String paymentTimestamp = JsonValidationUtil.patternMatcher(jsonNode, "PAYMNT_TIMESTMP");
-		JsonValidationUtil.updateJsonForString(jsonNode,"PAYMNT_TIMESTMP",paymentTimestamp);
+		//String  paymentTimestamp = JsonValidationUtil.patternMatcher(jsonNode, "PAYMNT_TIMESTMP");
+		//if(paymentTimestamp.isEmpty()) {
+			//JsonValidationUtil.getString(jsonNode, "PAYMNT_TIMESTMP", JsonValidationUtil.getSysTime());
+		//}
+		//else {
+		//JsonValidationUtil.updateJsonForString(jsonNode, "PAYMNT_TIMESTMP", paymentTimestamp);
+		//}
 		
-		
-		//setting default for timestamp
-		/*String paymentTimestamp = JsonValidationUtil.getStringValue(jsonNode,"PAYMNT_TIMESTMP");
-		System.out.println("skdfld"+paymentTimestamp);
-		if(paymentTimestamp.equals(" ")||paymentTimestamp.isEmpty()) {
-		
-			String dateValue = JsonValidationUtil.getSysTime();
-			
-			JsonValidationUtil.getString(jsonNode, "PAYMNT_TIMESTMP", dateValue).asText();
-			
-		}
-		else {
-			paymentTimestamp = JsonValidationUtil.patternMatcher(jsonNode, "PAYMNT_TIMESTMP");
-			JsonValidationUtil.updateJsonForString(jsonNode, "PAYMNT_TIMESTMP", paymentTimestamp);
-		}*/
+		//System.out.println("paymentTimestamp"+paymentTimestamp);				
 		
 		String payerAcctAddress = JsonValidationUtil.getString(jsonNode, "PAYER_ACCT_ADDRESS", " ").asText();
 		JsonValidationUtil.updateJsonForString(jsonNode, "PAYER_ACCT_ADDRESS", payerAcctAddress);

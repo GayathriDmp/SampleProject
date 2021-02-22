@@ -45,15 +45,9 @@ public class JsonValidationUtil {
 		
 		return Integer.parseInt(val);
 	}
-	/*public static String stringToDate(String dateString) throws Exception {
-
-		String localDate = LocalDate.parse(dateString).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        return localDate;
-    }*/
 	
 	public static String convertDate(JsonNode node ,String dateString) throws Exception {
 
-         
 		if(getJsonNode(node,dateString)==true) {
 			String dateValue =node.get(dateString).asText();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -99,7 +93,11 @@ public class JsonValidationUtil {
 	
 	public static String getSysTime() {
 		LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Europe/London"));
-		return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
+		System.out.println("localDateTimelocalDateTimelocalDateTime "+localDateTime);
+		String formatted = localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
+		System.out.println("formattedformatted"+formatted);
+		//return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
+		return formatted;
 		
 	}
 	
@@ -123,7 +121,7 @@ public class JsonValidationUtil {
 	}
 	
 	
-	public static String getPaymentSubType(JsonNode node , String property) {
+	/*public static String getPaymentSubType(JsonNode node , String property) {
 		
 		if(node.has(property) && property.equals("PAYMNT_SUB_TYPE")){
 			String key = node.get(property).asText();
@@ -145,7 +143,7 @@ public class JsonValidationUtil {
 		return "";
 		
 		
-	}
+	}*/
 	
 	public static String convertISODate(JsonNode node , String property) {
 		if(node.has(property)) {
@@ -156,7 +154,7 @@ public class JsonValidationUtil {
 }
 
 	
-public static String getsplPaymentType(JsonNode node , String property) {
+/*public static String getsplPaymentType(JsonNode node , String property) {
 		
 		if(node.has(property) && property.equals("SPL_PAYMNT_TYPE")){
 			String key = node.get(property).asText();
@@ -178,7 +176,7 @@ public static String getsplPaymentType(JsonNode node , String property) {
 		return "";
 		
 		
-	}
+	}*/
 	
 	
 	public static JsonNode updateJsonForString(JsonNode node,String property,String updatedValue) {
@@ -198,7 +196,7 @@ public static String getsplPaymentType(JsonNode node , String property) {
 	}
 	
 	public static boolean nullCheck(JsonNode node,String property) {
-		if(!((node.get(property) == null || node.get(property).isNull()))) {
+		if(node.get(property) != null ||!node.get(property).isNull()) {
 			
 			System.out.println("Values are not null");
 			return false;
@@ -222,7 +220,7 @@ public static String getsplPaymentType(JsonNode node , String property) {
 	
 	public static boolean emptyCheckForString(JsonNode node,String property) {
 		
-		if(!( node.get(property).asText().isEmpty())){
+		if(!node.get(property).asText().equals(" ")||!node.get(property).isEmpty()){
 			
 			System.out.println("String values are not empty");
 			return false;

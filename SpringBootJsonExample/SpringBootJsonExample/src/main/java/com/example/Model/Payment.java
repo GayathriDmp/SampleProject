@@ -1,12 +1,11 @@
 package com.example.Model;
 
 
-import java.time.LocalDate;
 
 import java.util.Arrays;
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 
 public class Payment {
 			
@@ -84,13 +83,79 @@ public class Payment {
 	private int beneBanklineCustomerId;
 	@JsonProperty("BANKID")
 	private String bankId; 
-	@JsonProperty("ARIC_MODE")
-	private String aricMode;
 	@JsonProperty("edi_business_day")
 	private String ediBusinessDay;
 	@JsonProperty("src_sys_inst_id")
 	private String srcSysInstId;
+	@JsonProperty("BENE_CUSTOMER_NUMBER")
+	private int beneCustomerNum;
+	@JsonProperty("ARIC_MODE")
+	private String aricMode;
+
+	//for not-nullable fields , if not present , throws exception
+	@JsonCreator
+	public Payment(@JsonProperty(value="PAYMNT_AMOUNT",required=true)Double paymentAmount, 
+			@JsonProperty(value="PAYMNT_CURRENCY",required=true)String paymentCurrency, 
+			@JsonProperty(value= "PAYMNT_SENT_DATE",required=true)String paymentSentDate, 
+			@JsonProperty(value="PAYMNT_TIMESTMP",required=true)String paymentTimestamp,
+			@JsonProperty(value="ORIG_AMOUNT",required=true)Double origAmount, 
+			@JsonProperty(value="BRAND",required=true)String brand, 
+			@JsonProperty(value = "BENE_CUSTOMER_ID" ,required=true)String[] beneCustomerId) {
+			//,@JsonProperty(value="BENE_CUSTOMER_NUMBER",required=true)Integer beneCustomerNum){
+	if(paymentAmount!=null) {
+		this.paymentAmount = paymentAmount;
+	}
+	else {
+		throw new IllegalArgumentException("Missing Attribute "+paymentAmount);
+	}
+	if(paymentCurrency!=null) {
+		this.paymentCurrency = paymentCurrency;
+	}
+	else {
+		throw new IllegalArgumentException("Missing Attribute "+paymentCurrency);
+	}
+	if(paymentSentDate!=null) {
+			this.paymentSentDate=paymentSentDate;
+	}
+	else {
+		throw new IllegalArgumentException("Missing Attribute "+paymentSentDate);
+	}
+			
+	if(paymentTimestamp!=null) {
+		this.paymentTimestamp = paymentTimestamp;
+	}
+	else {
+		throw new IllegalArgumentException("Missing Attribute "+paymentTimestamp);
+	}
+	if(origAmount!=null){
+		this.origAmount = origAmount;
+		}
+	else {
+		throw new IllegalArgumentException("Missing Attribute "+origAmount);
+	}
+					
+	if(brand!=null)	{
+		this.brand = brand;
+	}
+	else {
+		throw new IllegalArgumentException("Missing Attribute "+brand);
+	}
+	if(beneCustomerId!=null) {
+		this.beneCustomerId = beneCustomerId;
+	}
 	
+	else {
+		throw new IllegalArgumentException("Missing Attribute "+beneCustomerId);
+	}
+	
+	/*if(beneCustomerNum!=null) {
+		this.beneCustomerNum = beneCustomerNum;
+	}
+	else {
+		throw new IllegalArgumentException("Missing Attribute "+beneCustomerNum);
+	}*/
+	}
+
 	public String getPaymentType() {
 		return paymentType;
 	}
@@ -332,6 +397,14 @@ public class Payment {
 		this.srcSysInstId = srcSysInstId;
 	}
 	
+	public int getBeneCustomerNum() {
+		return beneCustomerNum;
+	}
+	
+	public void setBeneCustomerNum(int beneCustomerNum) {
+		this.beneCustomerNum = beneCustomerNum;
+		
+	}
 	
 	@Override
 	public String toString() {
@@ -350,7 +423,7 @@ public class Payment {
 				+ ", payerReferenceInfo=" + payerReferenceInfo + ", brand=" + brand + ", beneCustomerId="
 				+ Arrays.toString(beneCustomerId) + ", tenantId=" + tenantId + ", beneBanklineCustomerId="
 				+ beneBanklineCustomerId + ", bankId=" + bankId + ", aricMode=" + aricMode + ", ediBusinessDay=" + ediBusinessDay
-				+ ", srcSysInstId=" + srcSysInstId  + "]";
+				+ ", srcSysInstId=" + srcSysInstId  + ", beneCustomerNum=" + beneCustomerNum +"]";
 	}
 	
 	
