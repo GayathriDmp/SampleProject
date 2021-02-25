@@ -7,12 +7,14 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.springframework.format.datetime.DateFormatter;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -53,6 +55,7 @@ public class JsonValidationUtil {
 		if(getJsonNode(node,dateString)==true) {
 			String dateValue =node.get(dateString).asText();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			
 			LocalDate date = LocalDate.parse(dateValue, formatter);
 			return date.toString();
 		}
@@ -60,20 +63,24 @@ public class JsonValidationUtil {
 		
     }
 	
-	public  String convertZonedDateTime(JsonNode node , String dateProperty) throws DateTimeParseException {
+	public String convertZonedDateTime(JsonNode node , String dateProperty) throws DateTimeParseException {
 		if(node.has(dateProperty)) {
 			String date;
 			
-			ZonedDateTime dateTime = ZonedDateTime.parse(node.get(dateProperty).asText(), DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS").withZone(ZoneId.of("Europe/London")));
+			ZonedDateTime dateTime = ZonedDateTime.parse(node.get(dateProperty).asText());
+			
+			
 					
-			//String lDt = dateTime.toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
-			//System.out.println("lDt"+lDt);
+			
 			
 			if(isDTSEnabled(dateTime.toLocalDateTime())) {
+				
 			date =  dateTime.plusHours(1).toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
+			System.out.println(date);
 			
 			}
 			else {
+				
 				date = dateTime.toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
 			}
 			return date;
@@ -83,7 +90,7 @@ public class JsonValidationUtil {
 		
 	
 	
-	public  boolean isDTSEnabled(LocalDateTime localDateTime) {
+	public boolean isDTSEnabled(LocalDateTime localDateTime) {
 		ZonedDateTime dateTime = ZonedDateTime.of(localDateTime, ZoneId.of("Europe/London"));
 		if(dateTime.getZone().getRules().isDaylightSavings(localDateTime.toInstant(dateTime.getOffset()))) {
 			return true;
@@ -93,93 +100,60 @@ public class JsonValidationUtil {
 		
 	}
 	
-	public  String getSysTime() {
+	public  static String getSysTime() {
 		LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Europe/London"));
 		System.out.println("localDateTimelocalDateTimelocalDateTime "+localDateTime);
-		String formatted = localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
-		System.out.println("formattedformatted"+formatted);
-		//return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
-		return formatted;
+		return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
+
 		
 	}
 	
-	public  String patternMatcher(JsonNode node , String property) {
-		
+	public String patternMatcher(JsonNode node , String property) {
+		String value;
 		if(node.has(property)) {
-		String value = node.get(property).asText();
-		
-		String regex = "\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d(?:\\.\\d+)Z";
-		Pattern pattern = Pattern.compile(regex);
-		if(!pattern.matcher(value).matches()) {
+		value = node.get(property).asText();
+		System.out.println("value"+value);
+				
+			if(value.contains("T")&&value.endsWith("Z")) {
+			System.out.println("contains T");
 			
 			return convertZonedDateTime(node,property);
+			
+	}
+		else if(value.contains("T")){
+		
+			return convertISODate(node,property);
+		
 		}
+		else {
 		
-		 return convertISODate(node,property);
-		
+		return value;
+	
+	}
 		}
 		return "";
-	
+		
 	}
 	
 	
-	/*public  String getPaymentSubType(JsonNode node , String property) {
-		
-		if(node.has(property) && property.equals("PAYMNT_SUB_TYPE")){
-			String key = node.get(property).asText();
-			
-			
-			Map<String , String> hashmap = new HashMap<>();
-			hashmap.put("10", "Single Immediate Payment");
-			hashmap.put("20", "Return Payment");
-			hashmap.put("25", "Scheme Return Payment");
-			hashmap.put("30", "Standing Order");
-			hashmap.put("40", "Forward Dated Single Payment");
-			hashmap.put("50", "Corporate Bulk Payment");
-		   // hashmap.forEach((k,v)->System.out.println(k+" "+v));
-		    
-		    return hashmap.get(key);
-		    
-		
-		}
-		return "";
-		
-		
-	}*/
 	
-	public  String convertISODate(JsonNode node , String property) {
+	public  static String convertISODate(JsonNode node ,String property) {
 		if(node.has(property)) {
+			System.out.println("date value here");
 		String [] arr = node.get(property).asText().split("\\+");
+		
+		System.out.println("splitted value"+arr[0].replace("T", "-").replaceAll(":", "."));
 		return   arr[0].replace("T", "-").replaceAll(":", ".");
 		}
-		return "";
+		else {
+			return "";
+		}
+		
+		
 }
 
 	
-/*public  String getsplPaymentType(JsonNode node , String property) {
-		
-		if(node.has(property) && property.equals("SPL_PAYMNT_TYPE")){
-			String key = node.get(property).asText();
-			
-			
-			Map<String , String> hashmap = new HashMap<>();
-			hashmap.put("HO", "HOCA Payments");
-			hashmap.put("AG", "Agency Payments");
-			hashmap.put("SW", "Account Switched Paymrents");
-			hashmap.put("RR", "Reversal");
-			hashmap.put(" ", " ");
-			
-		  //  hashmap.forEach((k,v)->System.out.println(k+" "+v));
-		    
-		    return hashmap.get(key);
-		    
-		
-		}
-		return "";
-		
-		
-	}*/
-	
+
 	
 	public  JsonNode updateJsonForString(JsonNode node,String property,String updatedValue) {
 		if(node.has(property)) {
@@ -270,7 +244,7 @@ public class JsonValidationUtil {
 		
 		 if(!node.has(property)==true||nullCheck(node,property)==true||emptyCheckForString(node,property)==true){
 			 
-				// System.out.println(((ObjectNode) node).put(property,defaultValue));
+	
 		
 				return (((ObjectNode) node).put(property,defaultValue));
 				 
@@ -324,7 +298,7 @@ public class JsonValidationUtil {
 				values = String.join(delimiter, strList);
 		}
 			return values;
-			//(String[]) strList.toArray(new String[strList.size()]);
+			
 		}
 		return null;
 	}
