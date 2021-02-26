@@ -1,6 +1,8 @@
 package com.example.Controller;
 
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +13,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.Model.Payment;
+import com.example.Service.CustomizedException;
 import com.example.Service.CustomizedExceptionCodes;
+import com.example.Service.ErrorCode;
 import com.example.Service.MissingAttributeException;
 import com.example.config.ValidationService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -40,17 +44,19 @@ public class JsonController {
 		
 		//LoggerUtil.log(Level.getLevel("IPHDELIMITED"), " ",request,jsonNode.toString());
 	
-		//logger.info("validating the input josn ");	
-		jsonNode = validationService.iterateJson(jsonNode);
-	
-			if(!jsonNode.has("PAYMNT_TIMESTMP")) { 
-				 throw new MissingAttributeException("Missing Attribute",CustomizedExceptionCodes.MISSING_ATTRIBUTE); 
-			}
+		//logger.info("validating the input josn ");
+		try {
+			jsonNode = validationService.iterateJson(jsonNode);	
+		}
+		catch(CustomizedException e){
+			System.out.println(e.toString());
+		}
+		
+		
+		
 		 
-			
-		 
-	     Payment payment = mapper.readValue(jsonNode.toString(),Payment.class);
-	    System.out.println("Payment"+payment);
+	    // Payment payment = mapper.readValue(jsonNode.toString(),Payment.class);
+	    //System.out.println("Payment"+payment);
 	      
 	   //   String newNode = mapper.writeValueAsString(payment);
 	   // System.out.println("pojoToJson"+newNode);
