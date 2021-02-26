@@ -7,15 +7,13 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.format.ResolverStyle;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
-
-import org.springframework.format.datetime.DateFormatter;
+import java.util.Set;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -42,7 +40,7 @@ public class JsonValidationUtil {
 			 }
 	 
 	public  int ifEmptyString(String val) {
-		if(val.equals(" ")||val.equals("")) {
+		if(val.equals(" ")||val.trim().equals("")) {
 			
 			return 0;
 		}
@@ -68,10 +66,6 @@ public class JsonValidationUtil {
 			String date;
 			
 			ZonedDateTime dateTime = ZonedDateTime.parse(node.get(dateProperty).asText());
-			
-			
-					
-			
 			
 			if(isDTSEnabled(dateTime.toLocalDateTime())) {
 				
@@ -262,7 +256,14 @@ public class JsonValidationUtil {
 }
 	
 	
-	
+	public boolean isEmpty(JsonNode node , String property) {
+		if(!(StringUtils.containsWhitespace(node.get(property).asText()))) {
+			return true;
+		}
+		return false;
+		
+	}
+				
 	
 	public  ArrayNode getArrayNode(JsonNode node , String property) {
 		 if(node.isArray()) {
@@ -286,6 +287,54 @@ public class JsonValidationUtil {
 		  return true;
 		}
 	
+public  boolean getsplPaymentType(String value) {
+		
+		/*if(node.has(property) && property.equals("SPL_PAYMNT_TYPE")){
+			String key = node.get(property).asText();*/
+			
+			
+			Map<String , String> hashmap = new HashMap<>();
+			hashmap.put("HO", "HOCA Payments");
+			hashmap.put("AG", "Agency Payments");
+			hashmap.put("SW", "Account Switched Paymrents");
+			hashmap.put("RR", "Reversal");
+			hashmap.put(" ", " ");
+			
+		  //  hashmap.forEach((k,v)->System.out.println(k+" "+v));
+		    
+		    return hashmap.containsKey(value);
+		    
+		
+		}
+		
+		
+		
+	
+
+public  boolean getPaymentSubType(String value) {
+	
+	/*if(node.has(property) && property.equals("PAYMNT_SUB_TYPE")){
+		String key = node.get(property).asText();*/
+		
+		
+		Map<String , String> hashmap = new HashMap<>();
+		hashmap.put("10", "Single Immediate Payment");
+		hashmap.put("20", "Return Payment");
+		hashmap.put("25", "Scheme Return Payment");
+		hashmap.put("30", "Standing Order");
+		hashmap.put("40", "Forward Dated Single Payment");
+		hashmap.put("50", "Corporate Bulk Payment");
+	   // hashmap.forEach((k,v)->System.out.println(k+" "+v));
+	    //hashmap.get(key)
+	    return hashmap.containsKey(value);
+	    
+	
+	}
+	
+	
+	
+
+	
 	public  String ArrayNodeToString(JsonNode node , String property ,String delimiter) {
 		String values="";
 		List<String> strList = new LinkedList<String>();
@@ -301,6 +350,15 @@ public class JsonValidationUtil {
 			
 		}
 		return null;
+	}
+
+
+
+	public JsonNode getDouble(JsonNode node, String property) {
+		
+		return node.get(property);
+		// TODO Auto-generated method stub
+		
 	}
 }
 
