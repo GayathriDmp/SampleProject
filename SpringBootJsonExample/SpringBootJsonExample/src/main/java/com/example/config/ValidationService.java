@@ -32,7 +32,9 @@ public class ValidationService {
 			if(field.equals(config.getObject().get(2))) {
 				String requestValue = requestObject.get(field).asText();
 				if(!requestValue.equals(" ")) {
-					util.patternMatcher(requestObject, field);
+					//String dateTime =util.patternMatcher(requestObject, field);
+					String dateTime = util.convertDateTime(requestObject, field);
+					util.updateJsonForString(requestObject, field, dateTime);
 				}
 				else {
 					throw new CustomizedException(CustomizedExceptionCodes.DATETIME_PARSE_EXCEPTION_CODE.getId(),CustomizedExceptionCodes.DATETIME_PARSE_EXCEPTION_CODE.getName()+"for "+field,null,Thread.currentThread().getStackTrace());
@@ -43,30 +45,38 @@ public class ValidationService {
 			if(field.equals("PAYMNT_SUB_TYPE")) {
 				System.out.println(field+"is there");
 				String value =requestObject.get(field).asText();
-						if(util.getPaymentSubType(value)==true){
+				 if(value.isEmpty()) {
+					 
+					 util.getString(requestObject, field, "!");
+				 }
+				else if(util.getPaymentSubType(value)==true){
 							System.out.println(requestObject.get(field).asText()+"value ");
 					 util.getString(requestObject, field, value);
-							System.out.println("paymentSubType "+util.getString(requestObject, field, value).asText());
+						}
 					
-				}
+							
+					
+				
 						else {
 							throw new CustomizedException(CustomizedExceptionCodes.VALUE_IS_NOT_VALID.getId() , CustomizedExceptionCodes.VALUE_IS_NOT_VALID.getName()+"for "+field , null);
 						}
-			
 			}
+			
 			if(field.equals("SPL_PAYMNT_TYPE")) {
 				String value =requestObject.get(field).asText().trim();
 				System.out.println(value+"valuevaluevalue");
 				System.out.println(util.getsplPaymentType(value));
-						if(util.getsplPaymentType(value)==true){
+				if(value.isEmpty()){
+					util.getString(requestObject, field, "!");
+				}
+				
+				else if(util.getsplPaymentType(value)==true){
 							
 					         util.getString(requestObject, field, value);
-							System.out.println("paymentSubType "+util.getString(requestObject, field, value).asText());
+							System.out.println("splpaymenttype "+util.getString(requestObject, field, value).asText());
 					
 				}
-						else if(requestObject.get(field).asText().isBlank()) {
-							throw new CustomizedException(CustomizedExceptionCodes.VALUE_IS_NULL_EXCEPTION_CODE.getId() , CustomizedExceptionCodes.VALUE_IS_NULL_EXCEPTION_CODE.getName()+"for "+field , null);
-						}
+						
 						else {
 							throw new CustomizedException(CustomizedExceptionCodes.VALUE_IS_NOT_VALID.getId() , CustomizedExceptionCodes.VALUE_IS_NOT_VALID.getName()+"for "+field , null);
 						}
@@ -83,6 +93,13 @@ public class ValidationService {
 			}
 			
 		 
+			}
+			
+			if(field.equals("PAYMNT_CURRENCY"))
+							 {
+				String value =util.convertCurrency(requestObject, field);
+				System.out.println("currencycurrency"+value);
+				util.updateJsonForString(requestObject, field, value);
 			}
 			
 		

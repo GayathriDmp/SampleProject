@@ -9,6 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.example.config.CustomConfiguration;
+import com.example.utils.JsonValidationUtil;
 
 
 
@@ -37,6 +38,7 @@ public class SpringBootJsonExampleApplication implements CommandLineRunner{
 		config.getObject().forEach(System.out::println);
 	
 		System.out.println(config.getObject().get(2));
+		
 		
 	}
 

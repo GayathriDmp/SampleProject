@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -61,31 +60,52 @@ public class JsonValidationUtil {
 		
     }
 	
-	public String convertZonedDateTime(JsonNode node , String dateProperty) throws DateTimeParseException {
+	
+	public String convertDateTime(JsonNode node , String dateProperty) throws DateTimeParseException {
 		if(node.has(dateProperty)) {
 			String date;
-			
-			ZonedDateTime dateTime = ZonedDateTime.parse(node.get(dateProperty).asText());
-			
-			if(isDTSEnabled(dateTime.toLocalDateTime())) {
+			LocalDateTime dateTime =  null;
+			try {
+			dateTime = LocalDateTime.parse(node.get(dateProperty).asText() ,DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
+			System.out.println("dateTime"+dateTime);
+			}
+			catch(DateTimeParseException ex) {
+				try {
+				dateTime =LocalDateTime.parse(node.get(dateProperty).asText());
+				ZonedDateTime zonedDateTime = dateTime.atZone(ZoneId.of("UTC"));
+				System.out.println(zonedDateTime+"zonedDateTime");
+				dateTime = zonedDateTime.toLocalDateTime();		
+				System.out.println("dateTime"+dateTime);
+				}
+				catch(DateTimeParseException e) {
+					date =convertISODate(node.get(dateProperty).asText());
+					dateTime = LocalDateTime.parse(date ,DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
+					
+				}
+			}
+			if(isDSTEnabled(dateTime)) {
 				
-			date =  dateTime.plusHours(1).toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
+			date =  dateTime.plusHours(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));;
 			System.out.println(date);
 			
 			}
 			else {
 				
-				date = dateTime.toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
+				date = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
 			}
+			//dateTime.toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
 			return date;
 		}
 			return "";
 		}
 		
+		
+		
 	
 	
-	public boolean isDTSEnabled(LocalDateTime localDateTime) {
+	public static boolean isDSTEnabled(LocalDateTime localDateTime) {
 		ZonedDateTime dateTime = ZonedDateTime.of(localDateTime, ZoneId.of("Europe/London"));
+		//System.out.println("dateTimeDts"+dateTime);
 		if(dateTime.getZone().getRules().isDaylightSavings(localDateTime.toInstant(dateTime.getOffset()))) {
 			return true;
 		}
@@ -94,7 +114,7 @@ public class JsonValidationUtil {
 		
 	}
 	
-	public  static String getSysTime() {
+	public  String getSysTime() {
 		LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Europe/London"));
 		System.out.println("localDateTimelocalDateTimelocalDateTime "+localDateTime);
 		return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
@@ -102,49 +122,19 @@ public class JsonValidationUtil {
 		
 	}
 	
-	public String patternMatcher(JsonNode node , String property) {
-		String value;
-		if(node.has(property)) {
-		value = node.get(property).asText();
-		System.out.println("value"+value);
-				
-			if(value.contains("T")&&value.endsWith("Z")) {
-			System.out.println("contains T");
-			
-			return convertZonedDateTime(node,property);
-			
-	}
-		else if(value.contains("T")){
-		
-			return convertISODate(node,property);
-		
-		}
-		else {
-		
-		return value;
-	
-	}
-		}
-		return "";
-		
-	}
 	
 	
-	
-	public  static String convertISODate(JsonNode node ,String property) {
-		if(node.has(property)) {
-			System.out.println("date value here");
-		String [] arr = node.get(property).asText().split("\\+");
+	public  static String convertISODate(String property) {
+		
+		String [] arr = property.split("\\+");
 		
 		System.out.println("splitted value"+arr[0].replace("T", "-").replaceAll(":", "."));
-		return   arr[0].replace("T", "-").replaceAll(":", ".");
-		}
-		else {
-			return "";
+		return   arr[0].replace("T", "-").replaceAll(":", ".").replace("Z", " ");
+		
 		}
 		
 		
-}
+
 
 	
 
@@ -298,7 +288,7 @@ public  boolean getsplPaymentType(String value) {
 			hashmap.put("AG", "Agency Payments");
 			hashmap.put("SW", "Account Switched Paymrents");
 			hashmap.put("RR", "Reversal");
-			hashmap.put(" ", " ");
+			
 			
 		  //  hashmap.forEach((k,v)->System.out.println(k+" "+v));
 		    
@@ -324,6 +314,7 @@ public  boolean getPaymentSubType(String value) {
 		hashmap.put("30", "Standing Order");
 		hashmap.put("40", "Forward Dated Single Payment");
 		hashmap.put("50", "Corporate Bulk Payment");
+		
 	   // hashmap.forEach((k,v)->System.out.println(k+" "+v));
 	    //hashmap.get(key)
 	    return hashmap.containsKey(value);
